@@ -1,0 +1,28 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="themes_entries">
+        <item>Light Theme</item>
+        <item>Dark Theme</item>
+        <item>Follow System</item>
+    </string-array>
+
+    <string-array name="themes_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>auto</item>
+    </string-array>
+
+    <string-array name="platform_entries">
+        <item>Linux</item>
+        <item>OSX</item>
+        <item>Windows</item>
+        <item>Sunos</item>
+    </string-array>
+
+    <string-array name="platform_values">
+        <item>linux</item>
+        <item>osx</item>
+        <item>windows</item>
+        <item>sunos</item>
+    </string-array>
+</resources>

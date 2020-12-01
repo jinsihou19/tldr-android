@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">TLDR</string>
+    <string name="action_settings">设置</string>
+    <string name="search_btn">查询</string>
+    <string name="search_hint_tag">></string>
+    <string name="search_hint">命令</string>
+    <string name="search_empty_result">暂时没有收录这个命令哦</string>
+    <string name="search_empty_keyword">您还没有输入呢</string>
+
+    <string name="html_template_not_available">
+        <![CDATA[
+        <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" type="text/css" href="%1$s">
+            </head>
+            <body>
+                <blockquote>
+                这个命令还未被收录.<br />
+                <a href="https://github.com/tldr-pages/tldr/blob/master/CONTRIBUTING.md">如果您有兴趣，请提交一个新的命令到 tldr 项目，感谢您的支持。</a>
+                </blockquote>
+            </body>
+            </html>
+        ]]>
+    </string>
+    <string name="title_activity_settings">设置</string>
+    <string name="general_header">通用</string>
+    <string name="sync_header">同步</string>
+    <string name="platform_title">平台</string>
+    <string name="theme_title">主题</string>
+    <string name="sync_database_on">定时自动同步数据</string>
+    <string name="sync_database_off">关闭自动同步数据</string>
+    <string name="sync_title">自动更新</string>
+
+</resources>

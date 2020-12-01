@@ -1,0 +1,16 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="themes_entries">
+        <item>亮主题</item>
+        <item>暗主题</item>
+        <item>跟随系统</item>
+    </string-array>
+
+    <string-array name="themes_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>auto</item>
+    </string-array>
+
+
+</resources>
