@@ -88,6 +88,10 @@ public class Command {
             map.put("platform", platform);
             return map;
         }
+
+        public String[] toStringArray() {
+            return new String[]{name, platform};
+        }
     }
 
     public Index getIndex() {

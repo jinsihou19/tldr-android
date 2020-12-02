@@ -184,8 +184,8 @@ public class CommandRepository {
         executors.diskIO().execute(() -> commandFavoritesDAO.delete(new CommandFavoritesEntity(index)));
     }
 
-    public void toggleLike(Command.Index index) {
-
+    public LiveData<List<Command.Index>> getFavorites() {
+        return commandFavoritesDAO.list();
     }
 
     /**

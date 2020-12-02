@@ -78,6 +78,10 @@ public class FirstFragment extends Fragment implements SharedPreferences.OnShare
             gotoContent();
         });
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        binding.favoriteBtn.setOnClickListener(v -> NavHostFragment
+                .findNavController(FirstFragment.this)
+                .navigate(R.id.action_FirstFragment_to_favoritesFragment));
     }
 
     private Set<String> getPlatformFilter(SharedPreferences sharedPreferences) {

@@ -45,7 +45,6 @@ public class CommandViewModel extends AndroidViewModel {
         like = commandRepository.isLike(index);
     }
 
-
     public void like(Command.Index index) {
         commandRepository.like(index);
     }
@@ -56,6 +55,10 @@ public class CommandViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> isLike() {
         return like;
+    }
+
+    public LiveData<List<Command.Index>> getFavorites(){
+        return commandRepository.getFavorites();
     }
 
 }

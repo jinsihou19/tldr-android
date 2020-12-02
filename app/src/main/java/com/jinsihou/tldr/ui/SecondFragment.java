@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
@@ -28,6 +29,11 @@ import java.nio.charset.StandardCharsets;
 public class SecondFragment extends Fragment {
     private FragmentSecondBinding binding;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +45,7 @@ public class SecondFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity mainActivity = (MainActivity) requireActivity();
         mainActivity.setExpanded(true);
+        mainActivity.getFAB().setVisibility(View.VISIBLE);
         CommandViewModel model = new ViewModelProvider(mainActivity).get(CommandViewModel.class);
         LifecycleOwner owner = getViewLifecycleOwner();
         LiveData<Command> command = model.getCommand();

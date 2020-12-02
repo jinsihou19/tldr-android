@@ -6,6 +6,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="appbar_size">192dp</dimen>
     <dimen name="padding">8dp</dimen>
-    <dimen name="text_size_medium">24sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_large">36sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
 </resources>
