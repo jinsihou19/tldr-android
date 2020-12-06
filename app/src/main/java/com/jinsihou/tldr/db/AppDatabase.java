@@ -9,7 +9,11 @@ import androidx.room.TypeConverters;
 
 import com.jinsihou.tldr.AppExecutors;
 
-@Database(entities = {CommandEntity.class, HistoryEntity.class, CommandFavoritesEntity.class}, version = 1)
+@Database(entities = {CommandEntity.class,
+        HistoryEntity.class,
+        CommandFavoritesEntity.class,
+        AppInfoEntity.class
+}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "commands-db";
@@ -20,6 +24,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract HistoryDAO historyDAO();
 
     public abstract CommandFavoritesDAO commandFavoritesDAO();
+
+    public abstract AppInfoDAO appInfoDAO();
 
     public static AppDatabase getInstance(final Context context, final AppExecutors executors) {
         if (sInstance == null) {

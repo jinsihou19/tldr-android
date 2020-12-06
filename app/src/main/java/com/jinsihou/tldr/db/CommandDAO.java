@@ -3,6 +3,7 @@ package com.jinsihou.tldr.db;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.jinsihou.tldr.data.Command;
@@ -33,7 +34,7 @@ public interface CommandDAO {
     @Query("SELECT * FROM commands WHERE name == :name and platform=:platform and (lang == 'en' or lang == :local)")
     LiveData<List<CommandEntity>> findOnPlatform(String name, String platform, String local);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(CommandEntity... commandEntity);
 
 }

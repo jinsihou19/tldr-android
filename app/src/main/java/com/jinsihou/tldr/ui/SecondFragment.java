@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.github.rjeschke.txtmark.Processor;
@@ -28,11 +30,14 @@ import java.nio.charset.StandardCharsets;
 
 public class SecondFragment extends Fragment {
     private FragmentSecondBinding binding;
+    private NavController nav;
+    private CommandViewModel model;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        nav = NavHostFragment.findNavController(this);
+        model = new ViewModelProvider(requireActivity()).get(CommandViewModel.class);
     }
 
     @Override
@@ -41,58 +46,70 @@ public class SecondFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        mainActivity.setExpanded(true);
-        mainActivity.getFAB().setVisibility(View.VISIBLE);
-        CommandViewModel model = new ViewModelProvider(mainActivity).get(CommandViewModel.class);
         LifecycleOwner owner = getViewLifecycleOwner();
-        LiveData<Command> command = model.getCommand();
-        if (command == null) {
-            // 无法获取数据就返回查询页面
-            NavHostFragment
-                    .findNavController(SecondFragment.this)
-                    .navigate(R.id.action_SecondFragment_to_FirstFragment);
-        } else {
-            command.observe(owner, cmd -> {
-                Command.Index index = cmd.getIndex();
-                mainActivity.setText(cmd.getName());
-                renderMarkdown(cmd);
-                model.queryLike(index);
-                mainActivity.getFAB().setOnClickListener(v -> {
-                    LiveData<Boolean> like = model.isLike();
-                    if (like.getValue() == null || !like.getValue()) {
-                        model.like(index);
-                    } else {
-                        model.unlike(index);
+        Observer<Command> cmdObserver = cmd -> {
+            if (Command.EMPTY.equals(cmd)) {
+                Observer<Boolean> observer = isLoad -> {
+                    if (isLoad) {
+                        nav.navigate(R.id.action_SecondFragment_to_waitFragment);
                     }
-                });
-                model.isLike().observe(owner, isLike -> {
-                    if (isLike) {
-                        mainActivity.getFAB().setImageResource(R.drawable.ic_favorite_full);
-                    } else {
-                        mainActivity.getFAB().setImageResource(R.drawable.ic_favorite_border);
-                    }
-                });
-            });
-        }
+                };
+                model.isLoad().removeObserver(observer);
+                model.isLoad().observe(owner, observer);
+                dealWithEmpty();
+            } else {
+                createContent(cmd);
+            }
+        };
+        model.getCommand().removeObserver(cmdObserver);
+        model.getCommand().observe(owner, cmdObserver);
     }
 
-    private void renderMarkdown(Command cmd) {
-        String body;
-        if (Command.EMPTY.equals(cmd)) {
-            ((MainActivity) requireActivity()).getFAB().setVisibility(View.INVISIBLE);
-            String tpl = getString(R.string.html_template_not_available);
-            body = String.format(tpl, getStyle());
-        } else {
-            String markdown = Processor.process(cmd.getText())
-                    .replace("{{", "<span class=\"parameter\">")
-                    .replace("}}", "</span>");
-            String tpl = getString(R.string.html_template);
-            body = String.format(tpl, markdown, getStyle());
-        }
+    private void createContent(Command cmd) {
+        dealWithCMD(cmd);
+        Command.Index index = cmd.getIndex();
+        MainActivity mainActivity = (MainActivity) requireActivity();
+        mainActivity.setText(index.name);
+        mainActivity.setExpanded(true);
+        mainActivity.getFAB().setVisibility(View.VISIBLE);
+        model.queryLike(index);
+        mainActivity.getFAB().setOnClickListener(v -> {
+            LiveData<Boolean> like = model.isLike();
+            if (like.getValue() == null || !like.getValue()) {
+                model.like(index);
+            } else {
+                model.unlike(index);
+            }
+        });
+        model.isLike().observe(getViewLifecycleOwner(), isLike -> {
+            if (isLike) {
+                mainActivity.getFAB().setImageResource(R.drawable.ic_favorite_full);
+            } else {
+                mainActivity.getFAB().setImageResource(R.drawable.ic_favorite_border);
+            }
+        });
+    }
 
+    private void dealWithEmpty() {
+        ((MainActivity) requireActivity()).getFAB().setVisibility(View.INVISIBLE);
+        String tpl = getString(R.string.html_template_not_available);
+        String body = String.format(tpl, getStyle());
+        renderMarkdown(body);
+    }
+
+    private void dealWithCMD(Command cmd) {
+        String markdown = Processor.process(cmd.getText())
+                .replace("{{", "<span class=\"parameter\">")
+                .replace("}}", "</span>");
+        String tpl = getString(R.string.html_template);
+        String body = String.format(tpl, markdown, getStyle());
+        renderMarkdown(body);
+    }
+
+    private void renderMarkdown(String body) {
         binding.webview.loadDataWithBaseURL(Constants.ASSETS_BASE_URL, body,
                 Constants.MIME_TYPE_HTML, StandardCharsets.UTF_8.toString(), null);
     }

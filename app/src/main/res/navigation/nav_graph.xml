@@ -8,32 +8,49 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.jinsihou.tldr.ui.FirstFragment"
-        android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            app:destination="@id/SecondFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_FirstFragment_to_favoritesFragment"
-            app:destination="@id/favoritesFragment" />
+            app:destination="@id/favoritesFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
         android:name="com.jinsihou.tldr.ui.SecondFragment"
-        android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_waitFragment"
+            app:destination="@id/waitFragment" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.jinsihou.tldr.ui.FavoritesFragment"
-        android:label="fragment_favorites"
+        android:label="favorites"
         tools:layout="@layout/fragment_favorites">
         <action
             android:id="@+id/action_favoritesFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
+    </fragment>
+    <action android:id="@+id/action_global_FirstFragment" app:destination="@id/FirstFragment" />
+    <fragment
+        android:id="@+id/waitFragment"
+        android:name="com.jinsihou.tldr.ui.WaitFragment"
+        android:label="TLDR"
+        tools:layout="@layout/fragment_wait">
+        <action
+            android:id="@+id/action_waitFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment"
+            app:popUpTo="@id/SecondFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

@@ -43,7 +43,6 @@
     <string name="favorites_activity_title">Favorites</string>
 
 
-
     <!-- Preference Titles -->
     <string name="general_header">General</string>
     <string name="sync_header">Sync</string>
@@ -57,4 +56,6 @@
     </string>
     <string name="sync_database_off">Only download data when manually requested</string>
     <string name="sync_title">Sync Automatically</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="sync_data_wait_hit">Preparing data please wait…</string>
 </resources>

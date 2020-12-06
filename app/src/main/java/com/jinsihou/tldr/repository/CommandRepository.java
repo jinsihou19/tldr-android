@@ -12,6 +12,8 @@ import com.jinsihou.tldr.AppExecutors;
 import com.jinsihou.tldr.BasicApplication;
 import com.jinsihou.tldr.data.Command;
 import com.jinsihou.tldr.db.AppDatabase;
+import com.jinsihou.tldr.db.AppInfoDAO;
+import com.jinsihou.tldr.db.AppInfoEntity;
 import com.jinsihou.tldr.db.CommandDAO;
 import com.jinsihou.tldr.db.CommandEntity;
 import com.jinsihou.tldr.db.CommandFavoritesDAO;
@@ -54,6 +56,7 @@ public class CommandRepository {
     private final CommandDAO commandDAO;
     private final HistoryDAO historyDAO;
     private final CommandFavoritesDAO commandFavoritesDAO;
+    private final AppInfoDAO appInfoDAO;
 
     private CommandRepository(Application application, AppExecutors executors) {
         AppDatabase appDatabase = ((BasicApplication) application).getDatabase();
@@ -62,6 +65,7 @@ public class CommandRepository {
         this.commandDAO = appDatabase.commandDao();
         this.historyDAO = appDatabase.historyDAO();
         this.commandFavoritesDAO = appDatabase.commandFavoritesDAO();
+        this.appInfoDAO = appDatabase.appInfoDAO();
     }
 
     public static CommandRepository getInstance(Application application, AppExecutors executors) {
@@ -236,6 +240,17 @@ public class CommandRepository {
     }
 
     /**
+     * 数据加载中
+     */
+    public LiveData<Boolean> isLoad() {
+        MediatorLiveData<Boolean> load = new MediatorLiveData<>();
+        load.addSource(appInfoDAO.get(), appInfoEntity
+                -> load.setValue(AppInfoEntity.STATE.valueOf(appInfoEntity.state)
+                == AppInfoEntity.STATE.LOADING));
+        return load;
+    }
+
+    /**
      * 初始化加载数据
      */
     public void syncAndInitData() {
@@ -244,6 +259,7 @@ public class CommandRepository {
             if (value != 0) {
                 return;
             }
+            appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.LOADING));
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
@@ -292,7 +308,9 @@ public class CommandRepository {
                             }
                         }
                         commandDAO.insertAll(list.toArray(new CommandEntity[0]));
+                        appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.SUCCESS));
                     } catch (IOException e) {
+                        appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.FAILED));
                         Log.e("sync", "同步出错", e);
                     } finally {
                         application.getCacheDir().deleteOnExit();

@@ -61,4 +61,8 @@ public class CommandViewModel extends AndroidViewModel {
         return commandRepository.getFavorites();
     }
 
+    public LiveData<Boolean> isLoad(){
+        return commandRepository.isLoad();
+    }
+
 }

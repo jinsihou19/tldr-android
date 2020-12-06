@@ -6,6 +6,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jinsihou.tldr.R;
@@ -21,6 +25,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
         binding.appbarLayout.setExpanded(false);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        AppBarConfiguration appBarConfiguration =
+                new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupWithNavController(
+                binding.collapsingToolbarLayout,
+                binding.toolbar,
+                navController,
+                appBarConfiguration);
+
     }
 
     @Override
@@ -33,11 +46,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setText(int titleId) {
-        binding.toolbarLayout.setTitle(getString(titleId));
+        binding.collapsingToolbarLayout.setTitle(getString(titleId));
     }
 
     public void setText(String title) {
-        binding.toolbarLayout.setTitle(title);
+        binding.collapsingToolbarLayout.setTitle(title);
     }
 
     public void setExpanded(boolean expanded) {
