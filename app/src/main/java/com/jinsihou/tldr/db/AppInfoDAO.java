@@ -14,4 +14,8 @@ public interface AppInfoDAO {
 
     @Query("SELECT * FROM app_info limit 1")
     LiveData<AppInfoEntity> get();
+
+
+    @Query("SELECT * FROM app_info limit 1")
+    AppInfoEntity getInfo();
 }

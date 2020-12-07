@@ -240,6 +240,18 @@ public class CommandRepository {
     }
 
     /**
+     * 获取更新信息
+     */
+    public long getUpdateTime() {
+        AppInfoEntity info = appInfoDAO.getInfo();
+        if (info != null) {
+            return info.timestamp.getTime();
+        }
+
+        return 0;
+    }
+
+    /**
      * 数据加载中
      */
     public LiveData<Boolean> isLoad() {
@@ -259,71 +271,75 @@ public class CommandRepository {
             if (value != 0) {
                 return;
             }
-            appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.LOADING));
-            OkHttpClient client = new OkHttpClient();
+            syncTask();
+        });
+    }
 
-            Request request = new Request.Builder()
-                    .url(ZIP_URL)
-                    .build();
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                }
+    public void syncTask() {
+        appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.LOADING));
+        OkHttpClient client = new OkHttpClient();
 
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) {
-                    InputStream is = null;
-                    try {
-                        is = Objects.requireNonNull(response.body()).byteStream();
-                        File zip = new File(application.getCacheDir(), ZIP_FILENAME);
-                        ByteStreams.copy(is, new FileOutputStream(zip));
-                        ZipFile zipFile = new ZipFile(zip, ZipFile.OPEN_READ);
-                        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-                        List<CommandEntity> list = new ArrayList<>();
-                        while (entries.hasMoreElements()) {
-                            ZipEntry entry = entries.nextElement();
-                            if (entry.isDirectory()) {
-                                continue;
-                            }
-                            String name = entry.getName();
-                            if (!name.endsWith(".md")) {
-                                continue;
-                            }
-                            CommandEntity commandEntity = new CommandEntity();
-                            String[] split = name.split("/");
-                            if (split.length < 3) {
-                                continue;
-                            }
-                            if ("pages".equals(split[0])) {
-                                commandEntity.setLang("en");
-                            } else {
-                                commandEntity.setLang(split[0].substring(6));
-                            }
-                            try (InputStreamReader in = new InputStreamReader(zipFile.getInputStream(entry))) {
-                                commandEntity
-                                        .setName(split[2].substring(0, split[2].length() - 3))
-                                        .setPlatform(split[1])
-                                        .setText(CharStreams.toString(in));
-                                list.add(commandEntity);
-                            }
+        Request request = new Request.Builder()
+                .url(ZIP_URL)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) {
+                InputStream is = null;
+                try {
+                    is = Objects.requireNonNull(response.body()).byteStream();
+                    File zip = new File(application.getCacheDir(), ZIP_FILENAME);
+                    ByteStreams.copy(is, new FileOutputStream(zip));
+                    ZipFile zipFile = new ZipFile(zip, ZipFile.OPEN_READ);
+                    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+                    List<CommandEntity> list = new ArrayList<>();
+                    while (entries.hasMoreElements()) {
+                        ZipEntry entry = entries.nextElement();
+                        if (entry.isDirectory()) {
+                            continue;
                         }
-                        commandDAO.insertAll(list.toArray(new CommandEntity[0]));
-                        appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.SUCCESS));
-                    } catch (IOException e) {
-                        appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.FAILED));
-                        Log.e("sync", "同步出错", e);
-                    } finally {
-                        application.getCacheDir().deleteOnExit();
-                        try {
-                            if (is != null) {
-                                is.close();
-                            }
-                        } catch (IOException e) {
-                            Log.e("sync", "同步出错", e);
+                        String name = entry.getName();
+                        if (!name.endsWith(".md")) {
+                            continue;
+                        }
+                        CommandEntity commandEntity = new CommandEntity();
+                        String[] split = name.split("/");
+                        if (split.length < 3) {
+                            continue;
+                        }
+                        if ("pages".equals(split[0])) {
+                            commandEntity.setLang("en");
+                        } else {
+                            commandEntity.setLang(split[0].substring(6));
+                        }
+                        try (InputStreamReader in = new InputStreamReader(zipFile.getInputStream(entry))) {
+                            commandEntity
+                                    .setName(split[2].substring(0, split[2].length() - 3))
+                                    .setPlatform(split[1])
+                                    .setText(CharStreams.toString(in));
+                            list.add(commandEntity);
                         }
                     }
+                    commandDAO.insertAll(list.toArray(new CommandEntity[0]));
+                    appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.SUCCESS));
+                } catch (Throwable e) {
+                    appInfoDAO.insert(AppInfoEntity.state(AppInfoEntity.STATE.FAILED));
+                    Log.e("sync", "同步出错", e);
+                } finally {
+                    application.getCacheDir().deleteOnExit();
+                    try {
+                        if (is != null) {
+                            is.close();
+                        }
+                    } catch (IOException e) {
+                        Log.e("sync", "同步出错", e);
+                    }
                 }
-            });
+            }
         });
     }
 

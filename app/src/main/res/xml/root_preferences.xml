@@ -23,7 +23,7 @@
     <PreferenceCategory app:title="@string/sync_header">
 
         <SwitchPreferenceCompat
-            app:key="sync"
+            app:key="auto_sync"
             app:summaryOff="@string/sync_database_off"
             app:summaryOn="@string/sync_database_on"
             app:title="@string/sync_title" />
