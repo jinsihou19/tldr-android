@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TLDR">
         <activity
-            android:name=".ui.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
-        <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.TLDR.NoActionBar"

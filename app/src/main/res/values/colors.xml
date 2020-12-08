@@ -24,4 +24,9 @@
 
     <color name="black_1">#656565</color>
 
+    <color name="blue_700">#344955</color>
+    <color name="blue_800">#232f34</color>
+    <color name="blue_600">#4a6572</color>
+    <color name="orange_500">#F9aa33</color>
+
 </resources>

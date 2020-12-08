@@ -34,5 +34,6 @@
     <string name="sync_title">自动更新</string>
     <string name="favorites_activity_title">收藏</string>
     <string name="sync_data_wait_hit">正在准备数据请等待…</string>
+    <string name="action_favorites">收藏</string>
 
 </resources>

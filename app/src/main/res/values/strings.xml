@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TLDR</string>
     <string name="action_settings">Settings</string>
+    <string name="action_favorites">Favorites</string>
     <string name="search_btn">Query</string>
     <string name="search_hint_tag">></string>
     <string name="search_hint">command</string>

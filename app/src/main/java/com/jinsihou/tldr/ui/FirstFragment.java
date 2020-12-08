@@ -33,15 +33,13 @@ import java.util.stream.Collectors;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-public class FirstFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class FirstFragment extends Fragment {
     private FragmentFirstBinding binding;
     private CommandViewModel model;
-    private SharedPreferences sharedPreferences;
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFirstBinding.inflate(inflater, container, false);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         return binding.getRoot();
     }
 
@@ -51,12 +49,8 @@ public class FirstFragment extends Fragment implements SharedPreferences.OnShare
     }
 
     private void initView() {
-        MainActivity mainActivity = (MainActivity) requireActivity();
-        mainActivity.setText(R.string.app_name);
-        mainActivity.setExpanded(false);
-
         model = new ViewModelProvider(requireActivity()).get(CommandViewModel.class);
-        setupIndex(getPlatformFilter(sharedPreferences));
+        setupIndex(getPlatformFilter());
         binding.search.setThreshold(1);
         binding.search.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -77,21 +71,18 @@ public class FirstFragment extends Fragment implements SharedPreferences.OnShare
             model.queryCommand(index);
             gotoContent();
         });
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
-        binding.favoriteBtn.setOnClickListener(v -> NavHostFragment
-                .findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_favoritesFragment));
     }
 
-    private Set<String> getPlatformFilter(SharedPreferences sharedPreferences) {
-        Set<String> platforms = new HashSet<>();
+    private Set<String> getPlatformFilter() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        Set<String> defaultPlatforms = new HashSet<>();
+        defaultPlatforms.add("linux");
+        defaultPlatforms.add("osx");
+        defaultPlatforms.add("sunox");
+        defaultPlatforms.add("windows");
+        Set<String> platforms = preferences.getStringSet("platform", defaultPlatforms);
         platforms.add("common");
-        platforms.add("linux");
-        platforms.add("osx");
-        platforms.add("sunox");
-        platforms.add("windows");
-        return sharedPreferences.getStringSet("platform", platforms);
+        return platforms;
     }
 
     private final Observer<List<Command.Index>> indexLister = indexList -> binding.search.setAdapter(
@@ -121,21 +112,11 @@ public class FirstFragment extends Fragment implements SharedPreferences.OnShare
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         binding = null;
     }
 
     private void closeSoftKeyboard() {
         InputMethodManager manager = (InputMethodManager) requireActivity().getSystemService(INPUT_METHOD_SERVICE);
         manager.hideSoftInputFromWindow(binding.search.getWindowToken(), 0);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ("platform".equals(key)) {
-            Set<String> platformFilter = getPlatformFilter(sharedPreferences);
-            platformFilter.add("common");
-            setupIndex(platformFilter);
-        }
     }
 }

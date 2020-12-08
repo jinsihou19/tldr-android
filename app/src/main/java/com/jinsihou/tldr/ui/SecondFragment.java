@@ -2,6 +2,8 @@ package com.jinsihou.tldr.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,17 +34,28 @@ public class SecondFragment extends Fragment {
     private FragmentSecondBinding binding;
     private NavController nav;
     private CommandViewModel model;
+    private MainActivity mainActivity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         nav = NavHostFragment.findNavController(this);
+        mainActivity = (MainActivity) requireActivity();
         model = new ViewModelProvider(requireActivity()).get(CommandViewModel.class);
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSecondBinding.inflate(inflater, container, false);
+        nav.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.SecondFragment) {
+                mainActivity.setExpanded(true);
+            } else {
+                mainActivity.setExpanded(false);
+                mainActivity.getFAB().setVisibility(View.GONE);
+            }
+        });
         return binding.getRoot();
     }
 
@@ -71,9 +84,7 @@ public class SecondFragment extends Fragment {
     private void createContent(Command cmd) {
         dealWithCMD(cmd);
         Command.Index index = cmd.getIndex();
-        MainActivity mainActivity = (MainActivity) requireActivity();
         mainActivity.setText(index.name);
-        mainActivity.setExpanded(true);
         mainActivity.getFAB().setVisibility(View.VISIBLE);
         model.queryLike(index);
         mainActivity.getFAB().setOnClickListener(v -> {
@@ -94,7 +105,6 @@ public class SecondFragment extends Fragment {
     }
 
     private void dealWithEmpty() {
-        ((MainActivity) requireActivity()).getFAB().setVisibility(View.INVISIBLE);
         String tpl = getString(R.string.html_template_not_available);
         String body = String.format(tpl, getStyle());
         renderMarkdown(body);
@@ -116,5 +126,17 @@ public class SecondFragment extends Fragment {
 
     private String getStyle() {
         return UIUtils.isDarkTheme(requireContext()) ? "dark_clearness.css" : "light_clearness.css";
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
