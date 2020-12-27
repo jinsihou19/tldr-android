@@ -1,14 +1,17 @@
 package com.jinsihou.tldr.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jinsihou.tldr.R;
@@ -32,7 +35,23 @@ public class MainActivity extends AppCompatActivity {
                 binding.toolbar,
                 navController,
                 appBarConfiguration);
+        initTheme();
+    }
 
+    private void initTheme() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = preferences.getString("theme", "auto");
+        switch (theme) {
+            case "light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "auto":
+            default:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
     }
 
     @Override
